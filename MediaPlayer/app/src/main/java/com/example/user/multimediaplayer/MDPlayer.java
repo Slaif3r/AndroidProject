@@ -2,6 +2,7 @@ package com.example.user.multimediaplayer;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.v7.app.ActionBar;
@@ -34,7 +35,7 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mdplayer);
-        np= new MediaPlayer();
+//        np= new MediaPlayer();
         // captura de accion de ImageButton
         btnpy = (ImageButton) findViewById(R.id.btnimgPlay);
         btnfw = (ImageButton) findViewById(R.id.btnimgForward);
@@ -59,63 +60,7 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
 
 
         //logica
-
-        actseekbar = new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                int trtime = np.getDuration();
-                sb.setMax(trtime);
-                int posact = 0;
-                int ejec = 0;
-                boolean bool = false;
-                while (posact < trtime) {
-                    try {
-                        sleep(500);
-                        posact = np.getCurrentPosition();
-                        sb.setProgress(posact);
-
-                        ejec = sb.getProgress();
-                        aux = getHRM(ejec);
-                        tRestante.setText(aux.toString().trim());
-                    } catch (Exception e) {
-                        tRestante.setText(aux);
-                    }
-                }
-            }
-        };
-        if (np != null) {
-            np.stop();
-        }
-        try {
-            Intent i = getIntent();
-            Bundle b = i.getExtras();
-            cns = (ArrayList) b.getParcelableArrayList("songs");
-            posicion = (int) b.getInt("pos", 0);
-            uri = Uri.parse(cns.get(posicion).toString());
-            nombrecancion.setText(cns.get(posicion).getName().toString());
-            np = MediaPlayer.create(getApplication(), uri);
-            actseekbar.start();
-            np.start();
-            tRestante.setText(getHRM(np.getDuration()));
-        } catch (Exception e) {
-        }
-        sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                np.seekTo(seekBar.getProgress());
-            }
-        });
+        playMusic();
     }
 
     private String getHRM(int milliseconds) {
@@ -132,6 +77,7 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
     public void onClick(View v) {
 
         int id = v.getId();
+
         switch (id) {
             case R.id.btnimgPlay:
                 System.out.println("IMPRIMIENDO");
@@ -141,10 +87,14 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
 
                     np.pause();
                 } else {
+
                     btnpy.setImageResource(R.drawable.pause);
-                    try{np.prepare();
+                    try{
+                        np.prepare();
                         np.start();
-                    }catch (IllegalStateException e){} catch (IOException e) {
+                    }catch (IllegalStateException e){
+                        e.printStackTrace();
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
 
@@ -185,7 +135,7 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
         try{
             sb.setMax(np.getDuration());//le envia el maximo a so portar seebark ok
         }catch (Exception e){
-
+e.printStackTrace();
         }
     }
 
@@ -205,6 +155,71 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
         sb.setMax(0);//le envia el maximo a so portar seebark ok
         tTranscurrido.setText( getHRM(np.getDuration()));//mostrar el tiempo que dura la cancion
         sb.setMax(np.getDuration());
+    }
+
+
+    public void playMusic()
+    {
+
+        actseekbar = new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                int trtime = np.getDuration();
+                sb.setMax(trtime);
+                int posact = 0;
+                int ejec = 0;
+                boolean bool = false;
+                while (posact < trtime) {
+                    try {
+                        sleep(500);
+                        posact = np.getCurrentPosition();
+                        sb.setProgress(posact);
+
+                        ejec = sb.getProgress();
+                        aux = getHRM(ejec);
+                        tRestante.setText(aux.toString().trim());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        tRestante.setText(aux);
+                    }
+                }
+            }
+        };
+        if (np != null) {
+            np.stop();
+        }
+        try {
+            Intent i = getIntent();
+            Bundle b = i.getExtras();
+            assert b != null;
+            cns = (ArrayList) b.getParcelableArrayList("Canciones");
+            posicion = (int) b.getInt("pos", 0);
+            uri = Uri.parse(cns.get(posicion).toString());
+            nombrecancion.setText(cns.get(posicion).getName().toString());
+            np = MediaPlayer.create(getApplication(), uri);
+            actseekbar.start();
+            np.start();
+            tRestante.setText(getHRM(np.getDuration()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                np.seekTo(seekBar.getProgress());
+            }
+        });
     }
 
 }
