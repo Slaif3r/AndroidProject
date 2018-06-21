@@ -16,8 +16,8 @@ import java.sql.Array;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-ListView lv;
-String[] items;
+    ListView lv;
+    String[] items;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +43,7 @@ String[] items;
 
     }
     public ArrayList<File> findSong(File root){
-       ArrayList<File>songs = new ArrayList<File>();
+        ArrayList<File>songs = new ArrayList<File>();
         File[]archivos=root.listFiles();
         for (File lista: archivos)
         {
