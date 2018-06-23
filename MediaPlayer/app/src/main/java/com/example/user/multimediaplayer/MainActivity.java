@@ -27,7 +27,7 @@ String[] items;
 
         items = new String[songs.size()];
         for(int i =0; i<songs.size();i++){
-            items[i]= songs.get(i).getName().toString().replace(".mp3","");
+            items[i]= songs.get(i).getName().replace(".mp3","");
 
         }
         ArrayAdapter<String>adapter = new ArrayAdapter<String>(getApplicationContext(),

@@ -18,7 +18,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="84dp" />
 
-    <LinearLayout
+    <GridLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/skBr"
@@ -29,27 +29,27 @@
 
         <TextView
             android:id="@+id/tTranscurrido"
-            android:layout_width="41dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:layout_marginLeft="5dp"
+            android:layout_marginLeft="16dp"
             android:ems="10"
             android:inputType="textPersonName"
             android:text="00:00"
-            tools:ignore="RtlCompat" />
+            tools:ignore="RtlCompat,TextViewEdits" />
 
         <TextView
             android:id="@+id/tRestante"
-            android:layout_width="43dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
-            android:layout_alignTop="@+id/tTranscurrido"
-            android:layout_marginLeft="295dp"
-            android:ems="10"
             android:inputType="textPersonName"
             android:text="00:00"
-            tools:ignore="RtlCompat" />
-    </LinearLayout>
+            android:layout_marginRight="16dp"
+            android:gravity="end"
+            tools:ignore="RtlCompat,TextViewEdits"
+            android:layout_row="0"
+            android:layout_column="2" />
+    </GridLayout>
 
 
 
