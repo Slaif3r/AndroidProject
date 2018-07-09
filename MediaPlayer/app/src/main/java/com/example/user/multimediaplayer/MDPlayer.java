@@ -85,7 +85,7 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
         switch (id) {
             case R.id.btnimgPlay:
                 Log.d(TAG,"IMPRIMIENDO");
-               Log.d(TAG,""+np.isPlaying());
+                Log.d(TAG,""+np.isPlaying());
                 if (np.isPlaying()) {
                     btnpy.setImageResource(R.drawable.play);
 
