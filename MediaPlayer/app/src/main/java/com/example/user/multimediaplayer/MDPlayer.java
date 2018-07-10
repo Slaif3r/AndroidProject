@@ -2,9 +2,11 @@ package com.example.user.multimediaplayer;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,14 +25,15 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
     static MediaPlayer np;
     ArrayList<File> cns;
     ArrayList<File> nombrecns;
-    Thread actseekbar;
+//    Thread actseekbar;
     int posicion;
     Uri uri;
     String aux;
-
+    public static int oneTimeOnly = 0;
     ImageButton btnpy, btnfw, btnbw, btnbck;
     TextView nombrecancion,tTranscurrido, tRestante;
     SeekBar sb;
+    private Runnable updateSongTime;
     private Handler myHandler = new Handler();
     private double startTime = 0;
     private double finalTime = 0;
@@ -48,7 +51,7 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
 
         //captura de accion SeekBar
         sb = (SeekBar) findViewById(R.id.skBr);
-
+        sb.setClickable(false);
         //captura de accion TextView
         tTranscurrido = (TextView) findViewById(R.id.tTranscurrido);
         tRestante     = (TextView) findViewById(R.id.tRestante);
@@ -61,10 +64,10 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
 
         //btnbck.setOnClickListener(this);
         sb.setOnClickListener(this);
-
-
+        updateSongTime = getRunnable();
         //logica
         playMusic();
+//        btnpy.setImageResource(R.drawable.pause);
     }
 
     private String getHRM(int milliseconds) {
@@ -73,7 +76,7 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
         int minutes = (int) ((milliseconds / (1000 * 60)) % 60);
         int hours = (int) ((milliseconds / (1000 * 60 * 60)) % 24);
         String aux = "";
-        aux = ((hours < 10) ? "0" + hours : hours) + ":" + ((minutes < 10) ? "0" + minutes : minutes) + ":" + ((seconds < 10) ? "0" + seconds : seconds);
+        aux = ((minutes < 10) ? "0" + minutes : minutes) + ":" + ((seconds < 10) ? "0" + seconds : seconds);
         return aux;
     }
 
@@ -87,20 +90,14 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
                 Log.d(TAG,"IMPRIMIENDO");
                 Log.d(TAG,""+np.isPlaying());
                 if (np.isPlaying()) {
-                    btnpy.setImageResource(R.drawable.play);
 
                     np.pause();
+                    btnpy.setImageResource(R.drawable.play);
+
                 } else {
 
+                    play();
                     btnpy.setImageResource(R.drawable.pause);
-                    try{
-                        np.prepare();
-                        np.start();
-                    }catch (IllegalStateException e){
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
 
                     Log.d(TAG,""+np.isPlaying());
                 }
@@ -123,6 +120,27 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
         }
 
     }
+
+    private void play() {
+        try {
+
+            np.start();
+
+            finalTime = np.getDuration();
+            startTime = np.getCurrentPosition();
+            if (oneTimeOnly == 0) {
+                sb.setMax((int) finalTime);
+                oneTimeOnly = 1;
+            }
+
+            sb.setProgress((int)startTime);
+            myHandler.postDelayed(getRunnable(), 100);
+//            tRestante.setText(getHRM(np.getDuration()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void NextCacion(){
         np.stop();
         //mp.release();
@@ -170,39 +188,25 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
             np.stop();
         }
         try {
+
             Intent i = getIntent();
             Bundle b = i.getExtras();
-            cns = (ArrayList) b.getParcelableArrayList("Canciones");
+            cns = (ArrayList) b.getParcelableArrayList("sound");
             posicion = (int) b.getInt("pos", 0);
             uri = Uri.parse(cns.get(posicion).toString());
             nombrecancion.setText(cns.get(posicion).getName());
             np = MediaPlayer.create(getApplication(), uri);
-            np.start();
-            tRestante.setText(getHRM(np.getDuration()));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                np.seekTo(seekBar.getProgress());
-            }
-        });
 
 
-        finalTime = np.getDuration();
-        startTime = np.getCurrentPosition();
-        sb.setMax(np.getDuration());
+        Log.d(TAG,"finalTime ==> "+np.getDuration()+" startTime "+startTime);
+        if (oneTimeOnly == 0) {
+            sb.setMax((int) finalTime);
+            oneTimeOnly = 1;
+        }
         sb.setProgress((int)startTime);
 
 
@@ -219,23 +223,25 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long)
                                 startTime)))
         );
-
-
-        Runnable UpdateSongTime = new Runnable() {
-            public void run() {
-                startTime = np.getCurrentPosition();
-                Log.d(TAG,"getCurrentPosition(): "+startTime);
-                tTranscurrido.setText(String.format("%d min, %d sec",
-                        TimeUnit.MILLISECONDS.toMinutes((long) startTime),
-                        TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
-                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.
-                                        toMinutes((long) startTime)))
-                );
-                sb.setProgress((int)startTime);
-                myHandler.postDelayed(this, 100);
-            }
-        };
-        myHandler.postDelayed(UpdateSongTime,100);
     }
 
+    @NonNull
+    private Runnable getRunnable() {
+        return new Runnable() {
+                @SuppressLint("DefaultLocale")
+                public void run() {
+                    startTime = np.getCurrentPosition();
+                    Log.d(TAG,"startTime"+startTime+ " - finalTime "+finalTime);
+                    tTranscurrido.setText(String.format("%d min, %d sec",
+                            TimeUnit.MILLISECONDS.toMinutes((long) startTime),
+                            TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
+                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.
+                                            toMinutes((long) startTime)))
+                    );
+                    Log.d(TAG,"tTranscurrido ==>"+tTranscurrido.getText().toString());
+                    sb.setProgress((int)startTime);
+                    myHandler.postDelayed(this, 100);
+                }
+            };
+    }
 }

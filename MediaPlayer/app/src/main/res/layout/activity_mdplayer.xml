@@ -36,7 +36,8 @@
             android:ems="10"
             android:inputType="textPersonName"
             android:text="00:00"
-            tools:ignore="RtlCompat,TextViewEdits" />
+            tools:ignore="RtlCompat,TextViewEdits"
+            android:layout_marginStart="16dp" />
 
         <TextView
             android:id="@+id/tRestante"
@@ -65,8 +66,6 @@
             android:id="@+id/btnimgBackWard"
             android:layout_width="39dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignStart="@+id/tTranscurrido"
             android:layout_marginBottom="12dp"
             android:layout_weight="1"
             app:srcCompat="@drawable/backward"
@@ -76,8 +75,6 @@
             android:id="@+id/btnimgPlay"
             android:layout_width="59dp"
             android:layout_height="53dp"
-            android:layout_alignTop="@+id/btnimgBackWard"
-            android:layout_centerHorizontal="true"
             android:layout_weight="1"
             app:srcCompat="@drawable/play" />
 
@@ -85,8 +82,6 @@
             android:id="@+id/btnimgForward"
             android:layout_width="58dp"
             android:layout_height="53dp"
-            android:layout_alignEnd="@+id/skBr"
-            android:layout_alignTop="@+id/btnimgBackWard"
             android:layout_weight="1"
             app:srcCompat="@drawable/forward"
             tools:ignore="RtlCompat" />

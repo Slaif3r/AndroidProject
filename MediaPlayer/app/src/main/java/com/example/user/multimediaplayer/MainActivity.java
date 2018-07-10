@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        lv=(ListView) findViewById(R.id.lvplayList);
+        lv=(ListView) findViewById(R.id.lvplayLists);
         final ArrayList<File> songs = findSong(Environment.getExternalStorageDirectory());
 
         items = new String[songs.size()];
