@@ -47,17 +47,17 @@
         android:text="descripcion" />
 
     <!-- Rightend Duration -->
-    <TextView
-        android:id="@+id/txtDuration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@id/txtTitle"
-        android:gravity="right"
-        android:text="5:45"
-        android:layout_marginRight="5dip"
-        android:textColor="#c97310"
-        android:textStyle="bold"/>
+    <!--<TextView-->
+        <!--android:id="@+id/txtDuration"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_alignTop="@id/txtTitle"-->
+        <!--android:gravity="right"-->
+        <!--android:text="5:45"-->
+        <!--android:layout_marginRight="5dip"-->
+        <!--android:textColor="#c97310"-->
+        <!--android:textStyle="bold"/>-->
 
     <!-- Rightend Arrow -->
     <ImageView
