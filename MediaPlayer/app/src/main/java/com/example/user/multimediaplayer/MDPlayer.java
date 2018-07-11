@@ -53,7 +53,7 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
 
         //captura de accion SeekBar
         sb = (SeekBar) findViewById(R.id.skBr);
-        sb.setClickable(false);
+//        sb.setClickable(false);
         //captura de accion TextView
         tTranscurrido = (TextView) findViewById(R.id.tTranscurrido);
         tRestante     = (TextView) findViewById(R.id.tRestante);
@@ -144,21 +144,34 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
     }
 
     public void NextCacion(){
-        np.stop();
-        //mp.release();
+        if (np.isPlaying()) {
+            np.stop();
+        }
+        np.reset();
 
         posicion = (posicion + 1) % cns.size();
         nombrecancion.setText(cns.get(posicion).getArtist());
 
-        uri = Uri.parse(cns.get(posicion).toString());
+//        uri = Uri.parse(cns.get(posicion).toString());
         if (np == null)
             np = new MediaPlayer();
 //        np = MediaPlayer.create(getApplicationContext(), uri);
 
-        np.start();
-        sb.setMax(0);//le envia el maximo a so portar seebark ok
-        tTranscurrido.setText(getHRM(np.getDuration()));//mostrar el tiempo que dura la cancion
+        np.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        try {
+            np.setDataSource(cns.get(posicion).getData());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         try{
+            np.prepare();
+//        np.start();
+            play();
+            sb.setMax(0);//le envia el maximo a so portar seebark ok
+            tTranscurrido.setText(getHRM(np.getDuration()));//mostrar el tiempo que dura la cancion
             sb.setMax(np.getDuration());//le envia el maximo a so portar seebark ok
         }catch (Exception e){
             e.printStackTrace();
@@ -166,8 +179,10 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
     }
 
     public void AntriorCacion(){
-        np.stop();
-        //mp.release();
+        if (np.isPlaying()) {
+            np.stop();
+        }
+        np.reset();
         //posicion=(posicion-1<0)? mysongs.size()-1: posicion-1;
         if (posicion - 1 < 0) {
             posicion = cns.size() - 1;
@@ -175,16 +190,25 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
             posicion = posicion - 1;
         }
         nombrecancion.setText(cns.get(posicion).getArtist());
-        uri = Uri.parse(cns.get(posicion).toString());
+//        uri = Uri.parse(cns.get(posicion).toString());
 //        np = MediaPlayer.create(getApplicationContext(), uri);
         if (np == null)
             np = new MediaPlayer();
 //        np = MediaPlayer.create(getApplicationContext(), uri);
-        np.prepareAsync();
-        np.start();
-        sb.setMax(0);//le envia el maximo a so portar seebark ok
-        tTranscurrido.setText( getHRM(np.getDuration()));//mostrar el tiempo que dura la cancion
-        sb.setMax(np.getDuration());
+        np.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        try {
+            np.setDataSource(cns.get(posicion).getData());
+            np.prepare();
+            play();
+            sb.setMax(0);//le envia el maximo a so portar seebark ok
+            tTranscurrido.setText( getHRM(np.getDuration()));//mostrar el tiempo que dura la cancion
+            sb.setMax(np.getDuration());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
 

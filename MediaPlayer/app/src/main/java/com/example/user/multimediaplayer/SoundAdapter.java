@@ -11,20 +11,22 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.example.user.model.Audio;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class SoundAdapter extends ArrayAdapter<File> {
+public class SoundAdapter extends ArrayAdapter<Audio> {
     private String TAG = "SoundAdapter";
-    List<MusicDefinition> musicDefinitionList;
-    public SoundAdapter(@NonNull Context context, List<File> sounds) {
+    List<Audio> musicDefinitionList;
+    public SoundAdapter(@NonNull Context context, List<Audio> sounds) {
         super(context,R.layout.sound_row, sounds);
-        musicDefinitionList = new ArrayList<MusicDefinition>();
-        for (File sound: sounds) {
-            musicDefinitionList.add(readFileMusic(sound));
-        }
+        musicDefinitionList =sounds;
+//        for (File sound: sounds) {
+//            musicDefinitionList.add(readFileMusic(sound));
+//        }
     }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -36,16 +38,16 @@ public class SoundAdapter extends ArrayAdapter<File> {
             viewHolder = new ViewHolder();
             viewHolder.txtTitleMusic = (TextView) convertView.findViewById(R.id.txtTitle);
             viewHolder.txtDetailMusic = (TextView) convertView.findViewById(R.id.txtDescription);
-            viewHolder.txtDuration = (TextView) convertView.findViewById(R.id.txtDuration);
+//            viewHolder.txtDuration = (TextView) convertView.findViewById(R.id.txtDuration);
             convertView.setTag(viewHolder);
         }else
         {
             // recycle the already inflated view
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        viewHolder.txtDuration.setText(musicDefinitionList.get(position).getDuration());
+//        viewHolder.txtDuration.setText(musicDefinitionList.get(position).getDuration());
         viewHolder.txtTitleMusic.setText(musicDefinitionList.get(position).getTitle());
-        viewHolder.txtDetailMusic.setText(musicDefinitionList.get(position).getDescription());
+        viewHolder.txtDetailMusic.setText(musicDefinitionList.get(position).getArtist());
         return convertView;
     }
     private static class ViewHolder {

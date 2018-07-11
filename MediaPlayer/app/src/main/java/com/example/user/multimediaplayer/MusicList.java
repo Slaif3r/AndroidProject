@@ -44,18 +44,9 @@ public class MusicList extends Fragment {
         rootView =  inflater.inflate(R.layout.fragment_music_list, container, false);
         context = container.getContext();
         listMusic = (ListView)rootView.findViewById(R.id.lvplayList);
-        final ArrayList<File> songs = findSong(Environment.getExternalStorageDirectory());
 
-        items = new String[songs.size()];
-        for(int i =0; i<songs.size();i++){
-            items[i]= songs.get(i).getName().replace(".mp3","");
-            Log.d(TAG,""+items[i]);
-        }
-//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,
-//                R.layout.songs,R.id.txtviewLargetext,items);
-//        listMusic.setAdapter(adapter);
-
-        SoundAdapter soundAdapter = new SoundAdapter(context,songs);
+        loadAudio();
+        SoundAdapter soundAdapter = new SoundAdapter(context,audioList);
         listMusic.setAdapter(soundAdapter);
         listMusic.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
