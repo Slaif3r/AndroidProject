@@ -22,17 +22,19 @@
         </activity>
         <activity
             android:name=".MDPlayer"
-            android:theme="@style/AppTheme"
-            />
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".MainActivity"
-            android:theme="@style/AppTheme"
             android:label="Reproductor de musica"
-            />
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".MenuActivity"
             android:label="@string/title_activity_menu"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".PlayListCreate"
+            android:label="@string/title_activity_play_list_create"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

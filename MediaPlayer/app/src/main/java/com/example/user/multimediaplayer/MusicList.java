@@ -78,9 +78,9 @@ public class MusicList extends Fragment {
                 String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
                 String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
                 String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-
+                String id = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
                 // Save to audioList
-                audioList.add(new Audio(data, title, album, artist));
+                audioList.add(new Audio(id,data, title, album, artist));
             }
         }
         if (cursor != null)
