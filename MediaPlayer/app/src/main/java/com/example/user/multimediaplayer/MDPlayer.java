@@ -130,14 +130,14 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
 
             finalTime = np.getDuration();
             startTime = np.getCurrentPosition();
-            if (oneTimeOnly == 0) {
-                sb.setMax((int) finalTime);
-                oneTimeOnly = 1;
-            }
-
+//            if (oneTimeOnly == 0) {
+//                sb.setMax((int) finalTime);
+//                oneTimeOnly = 1;
+//            }
+            sb.setMax(np.getDuration());
             sb.setProgress((int)startTime);
             myHandler.postDelayed(getRunnable(), 100);
-//            tRestante.setText(getHRM(np.getDuration()));
+            tRestante.setText(getHRM(np.getDuration()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -152,10 +152,8 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
         posicion = (posicion + 1) % cns.size();
         nombrecancion.setText(cns.get(posicion).getArtist());
 
-//        uri = Uri.parse(cns.get(posicion).toString());
         if (np == null)
             np = new MediaPlayer();
-//        np = MediaPlayer.create(getApplicationContext(), uri);
 
         np.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
@@ -168,7 +166,6 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
 
         try{
             np.prepare();
-//        np.start();
             play();
             sb.setMax(0);//le envia el maximo a so portar seebark ok
             tTranscurrido.setText(getHRM(np.getDuration()));//mostrar el tiempo que dura la cancion
@@ -201,7 +198,7 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
             np.setDataSource(cns.get(posicion).getData());
             np.prepare();
             play();
-            sb.setMax(0);//le envia el maximo a so portar seebark ok
+//            sb.setMax(0);//le envia el maximo a so portar seebark ok
             tTranscurrido.setText( getHRM(np.getDuration()));//mostrar el tiempo que dura la cancion
             sb.setMax(np.getDuration());
         } catch (IOException e) {
