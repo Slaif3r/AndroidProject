@@ -15,6 +15,8 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.example.user.model.Audio;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
     private String TAG = "MDPlayer";
     static MediaPlayer np;
-    ArrayList<File> cns;
+    ArrayList<Audio> cns;
     ArrayList<File> nombrecns;
 //    Thread actseekbar;
     int posicion;
@@ -146,10 +148,12 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
         //mp.release();
 
         posicion = (posicion + 1) % cns.size();
-        nombrecancion.setText(cns.get(posicion).getName());
+        nombrecancion.setText(cns.get(posicion).getArtist());
 
         uri = Uri.parse(cns.get(posicion).toString());
-        np = MediaPlayer.create(getApplicationContext(), uri);
+        if (np == null)
+            np = new MediaPlayer();
+//        np = MediaPlayer.create(getApplicationContext(), uri);
 
         np.start();
         sb.setMax(0);//le envia el maximo a so portar seebark ok
@@ -170,9 +174,13 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
         } else {
             posicion = posicion - 1;
         }
-        nombrecancion.setText(cns.get(posicion).getName());
+        nombrecancion.setText(cns.get(posicion).getArtist());
         uri = Uri.parse(cns.get(posicion).toString());
-        np = MediaPlayer.create(getApplicationContext(), uri);
+//        np = MediaPlayer.create(getApplicationContext(), uri);
+        if (np == null)
+            np = new MediaPlayer();
+//        np = MediaPlayer.create(getApplicationContext(), uri);
+        np.prepareAsync();
         np.start();
         sb.setMax(0);//le envia el maximo a so portar seebark ok
         tTranscurrido.setText( getHRM(np.getDuration()));//mostrar el tiempo que dura la cancion
@@ -188,15 +196,22 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
             np.stop();
         }
         try {
-
+            if (np == null)
+                np = new MediaPlayer();
+            np.reset();
             Intent i = getIntent();
             Bundle b = i.getExtras();
             cns = (ArrayList) b.getParcelableArrayList("sound");
             posicion = (int) b.getInt("pos", 0);
             uri = Uri.parse(cns.get(posicion).toString());
-            nombrecancion.setText(cns.get(posicion).getName());
-            np = MediaPlayer.create(getApplication(), uri);
+            nombrecancion.setText(cns.get(posicion).getArtist());
 
+//            np = MediaPlayer.create(getApplication(), uri);
+            np.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+            np.setDataSource(cns.get(posicion).getData());
+
+            np.prepareAsync();
         } catch (Exception e) {
             e.printStackTrace();
         }
