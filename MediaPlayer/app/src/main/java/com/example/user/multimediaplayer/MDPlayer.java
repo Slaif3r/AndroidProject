@@ -306,6 +306,7 @@ public class MDPlayer extends AppCompatActivity implements View.OnClickListener{
 
     private void newPlayList() {
         Intent intent = new Intent(MDPlayer.this, PlayListCreate.class);
+        intent.putExtra("sound_id",cns.get(posicion).getId());
         startActivity(intent);
         onStop();
     }

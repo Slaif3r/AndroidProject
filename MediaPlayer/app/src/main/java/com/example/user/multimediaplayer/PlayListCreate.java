@@ -1,5 +1,6 @@
 package com.example.user.multimediaplayer;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentResolver;
@@ -17,19 +18,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import java.io.File;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class PlayListCreate extends AppCompatActivity {
+public class PlayListCreate extends AppCompatActivity implements AdapterView.OnItemClickListener {
     private String TAG = "PlayListCreate";
     private String namePlayList;
+    private String sound_id="";
    private ArrayAdapter<String> adaptador;
     ListView lista;
     ArrayList<String> list;
@@ -76,14 +81,14 @@ public class PlayListCreate extends AppCompatActivity {
         });
 
 
-
-
+        sound_id = getIntent().getExtras().getString("sound_id");
 
         lista = (ListView)findViewById(R.id.lst_play);
 
         adaptador = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,list);
 
         lista.setAdapter(adaptador);
+        lista.setOnItemClickListener(this);
     }
 
     private void validarPlayListName(String namePlayList) {
@@ -190,9 +195,91 @@ public class PlayListCreate extends AppCompatActivity {
                 list.add(playlistName);
 //                playlistModel.add(new PlaylistModel(playlistName, noOfTracks));
             }
+        }
+    }
+
+    private void addToPlaylist(String playlistName, int songID) {
+
+
+        //get all playlists
+        @SuppressLint("Recycle") Cursor playListCursor = context.getContentResolver().query(
+                MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, new String[]{"*"}, null, null,
+                null);
+
+        long playlistId = 0;
+
+        assert playListCursor != null;
+        playListCursor.moveToFirst();
+
+        do {
+
+            //check if selected playlsit already exist
+            if (playListCursor.getString(playListCursor
+                    .getColumnIndex(MediaStore.Audio.Playlists.NAME)).
+                    equalsIgnoreCase(playlistName)) {
+
+                playlistId = playListCursor.getLong(playListCursor
+                        .getColumnIndex(MediaStore.Audio.Playlists._ID));
+                break;
+            }
+        } while (playListCursor.moveToNext());
+
+        //Playlist  doesnt exist creating new with given name
+        if (playlistId == 0) {
+
+            Log.d(TAG, "CREATING PLAYLIST: " + playlistName);
+
+            ContentValues playlisrContentValue = new ContentValues();
+
+            //Add name
+            playlisrContentValue.put(MediaStore.Audio.Playlists.NAME, playlistName);
+
+            //update modified value
+            playlisrContentValue.put(MediaStore.Audio.Playlists.DATE_MODIFIED,
+                    System.currentTimeMillis());
+
+            Uri playlistURl = context.getContentResolver().insert(
+                    MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, playlisrContentValue);
+
+            Log.d(TAG, "Added PlayLIst: " + playlistURl);
+
+        } else {
+
+            //Playlist alreay exist add to playlist
+            String[] cols = new String[]{
+                    "count(*)"
+            };
+
+            Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId);
+
+            Cursor favListCursor = context.getContentResolver().query(uri, cols, null, null, null);
+
+            assert favListCursor != null;
+            favListCursor.moveToFirst();
+
+            final int base = favListCursor.getInt(0);
+
+            //playlist updated delete older playlist art so that we can create new
+
+            favListCursor.close();
+
+            //add song to last
+            ContentValues values = new ContentValues();
+
+            values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, base + songID);
+
+            values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, songID);
+
+            context.getContentResolver().insert(uri, values);
 
 
         }
+    }
 
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Log.d(TAG,list.get(position)+ " sound_id: "+sound_id);
+        addToPlaylist(list.get(position),Integer.parseInt(sound_id));
+        finish();
     }
 }
