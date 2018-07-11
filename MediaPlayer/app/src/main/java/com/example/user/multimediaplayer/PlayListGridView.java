@@ -1,13 +1,22 @@
 package com.example.user.multimediaplayer;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import java.util.ArrayList;
 
 
 /**
@@ -18,16 +27,19 @@ import android.widget.GridView;
  * Use the {@link PlayListGridView#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PlayListGridView extends Fragment {
+public class PlayListGridView extends Fragment implements AdapterView.OnItemClickListener {
+    private String TAG = "PlayListGridView";
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
+    private Context context;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
+    ArrayList<String> list;
+    private ArrayAdapter<String> adaptador;
+    ListView lista;
     private OnFragmentInteractionListener mListener;
 
     public PlayListGridView() {
@@ -65,18 +77,15 @@ public class PlayListGridView extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView =  inflater.inflate(R.layout.fragment_music_list, container, false);
+        context = container.getContext();
+        list = new ArrayList<String>();
+        retrieveAllPlaylists();
+        lista = (ListView)rootView.findViewById(R.id.lvplayList);
 
+        adaptador = new ArrayAdapter<String>(context,android.R.layout.simple_list_item_1,list);
 
-        GridView gridview = (GridView) rootView.findViewById(R.id.playlist_gridview);
-//        gridview.setAdapter(new ImageAdapter(this));
-//
-//        gridview.setOnItemClickListener(new OnItemClickListener() {
-//            public void onItemClick(AdapterView<?> parent, View v,
-//                                    int position, long id) {
-//                Toast.makeText(HelloGridView.this, "" + position,
-//                        Toast.LENGTH_SHORT).show();
-//            }
-//        });
+        lista.setAdapter(adaptador);
+        lista.setOnItemClickListener(this);
         return rootView;
     }
 
@@ -87,21 +96,47 @@ public class PlayListGridView extends Fragment {
         }
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Log.d(TAG,list.get(position)+" <====== ");
+        Intent intent = new Intent(getActivity(), MainActivity.class);
+        intent.putExtra("playlist_name",list.get(position));
+        intent.putExtra("playlistid",getPlayListId(list.get(position)));
+        startActivity(intent);
+    }
+
+   private long getPlayListId(String playlistName){
+
+        //get all playlists
+        @SuppressLint("Recycle") Cursor playListCursor = context.getContentResolver().query(
+                MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, new String[]{"*"}, null, null,
+                null);
+
+        long playlistId = 0;
+
+        assert playListCursor != null;
+        playListCursor.moveToFirst();
+
+        do {
+
+            //check if selected playlsit already exist
+            if (playListCursor.getString(playListCursor
+                    .getColumnIndex(MediaStore.Audio.Playlists.NAME)).
+                    equalsIgnoreCase(playlistName)) {
+
+                playlistId = playListCursor.getLong(playListCursor
+                        .getColumnIndex(MediaStore.Audio.Playlists._ID));
+                break;
+            }
+        } while (playListCursor.moveToNext());
+        return playlistId;
     }
 
     /**
@@ -117,5 +152,35 @@ public class PlayListGridView extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+
+    public void retrieveAllPlaylists() {
+
+        Uri tempPlaylistURI = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+
+        final String idKey = MediaStore.Audio.Playlists._ID;
+        final String nameKey = MediaStore.Audio.Playlists.NAME;
+
+        final String[] columns = { idKey, nameKey };
+
+        Cursor playListCursor = context.getContentResolver().query(
+                tempPlaylistURI, columns, null, null, null);
+
+        if (playListCursor != null) {
+            Log.d("playlist cursor count=", "" + playListCursor.getCount());
+
+            for (boolean hasItem = playListCursor.moveToFirst(); hasItem; hasItem = playListCursor
+                    .moveToNext()) {
+                String  playlistName = playListCursor.getString(playListCursor
+                        .getColumnIndex(nameKey));
+                // noOfTracks = playListCursor.getInt(playListCursor
+                // .getColumnIndex(tracksCountKey));
+                Log.d(this.getClass().getName(), "playlistname=" + playlistName // returns only default playliststhe
+                        + "tracks=");
+                list.add(playlistName);
+//                playlistModel.add(new PlaylistModel(playlistName, noOfTracks));
+            }
+        }
     }
 }

@@ -82,8 +82,12 @@ public class MenuActivity extends AppCompatActivity
 
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_music) {
             Fragment fragment = new MusicList();
+            FragmentTransaction fragmentManager = getSupportFragmentManager().beginTransaction();
+            fragmentManager.replace(R.id.continer, fragment).commit();
+        }else if (id == R.id.nav_playlist) {
+            Fragment fragment = new PlayListGridView();
             FragmentTransaction fragmentManager = getSupportFragmentManager().beginTransaction();
             fragmentManager.replace(R.id.continer, fragment).commit();
         }
